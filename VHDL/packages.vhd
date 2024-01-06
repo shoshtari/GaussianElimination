@@ -1,0 +1,10 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+
+PACKAGE arrays IS
+  TYPE t_coefficients IS ARRAY (NATURAL RANGE <>, NATURAL RANGE <>) OF INTEGER;
+  TYPE t_products IS ARRAY (NATURAL RANGE <>) OF INTEGER;
+  TYPE t_result IS ARRAY (NATURAL RANGE <>) OF INTEGER;
+  TYPE t_array IS ARRAY (NATURAL RANGE <>) OF INTEGER;
+END PACKAGE;
