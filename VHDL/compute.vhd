@@ -12,8 +12,8 @@ ENTITY computeGaussian IS
         coefficients : INOUT t_coefficients(0 TO N - 1, 0 TO N - 1);
         products : INOUT t_products(0 TO N - 1);
         result : OUT t_result(0 TO N - 1);
-        data_in_changed : INOUT STD_LOGIC;
-        data_ready : OUT STD_LOGIC
+        data_in_changed : INOUT STD_LOGIC;  -- when user changes coe and products set this to 1
+        data_ready : OUT STD_LOGIC          -- returns 1 when calculation is done
     );
 END ENTITY computeGaussian;
 
@@ -28,6 +28,8 @@ BEGIN
         IF rising_edge(clk) THEN
             IF data_in_changed = '0' THEN
                 IF this_row = N THEN
+                    -- after n clock cycle this_row would become N and we should calculate 
+                    -- result array based on products buffer
                     FOR i IN 0 TO N - 1 LOOP -- maybe we should use #for generate
                         result(i) <= products(order(i));
                     END LOOP;
@@ -48,6 +50,7 @@ BEGIN
                     --                           for x in coefficients[this_row]]
                     -- end divide
 
+                    -- setting coe of index for other equations to 0
                     FOR row IN 0 TO N - 1 LOOP
                         IF row /= this_row THEN
                             ceo := coefficients(row, index);
@@ -59,7 +62,9 @@ BEGIN
 
                     this_row <= this_row + 1;
                 END IF;
+
             ELSIF data_in_changed = '1' THEN
+                -- when input data changed
                 this_row <= 0;
                 order <= (OTHERS => 0);
                 data_in_changed <= '0';
