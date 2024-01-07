@@ -53,23 +53,29 @@ BEGIN
         data_ready => data_ready
     );
 
-    stimulus :
-    PROCESS BEGIN
-        WAIT FOR 100ns;
-        coefficients(0, 0) <= "0" & "001111" & "000000000"; -- 2
-        coefficients(0, 1) <= "0" & "001111" & "000000000";
-        coefficients(1, 0) <= "0" & "001111" & "000000000";
-        coefficients(1, 0) <= "0" & "001111" & "000000000";
+	PROCESS
+	BEGIN
+		clk <= '1';
+		WAIT FOR 10ns;
+		clk <= '0';
+		WAIT FOR 10ns;
+	END PROCESS;
+	
+	PROCESS BEGIN
 
-        products(0) <= "0" & "010000" & "000000000";
-        products(1) <= "0" & "010000" & "000000001";
+		data_in_changed <= '0';
+		WAIT FOR 50ns;
+		coefficients(0, 0) <= "0" & "001111" & "000000000"; -- 2
+		coefficients(0, 1) <= "0" & "001111" & "000000000";
+		coefficients(1, 0) <= "0" & "001111" & "000000000";
+		coefficients(1, 1) <= "0" & "001111" & "000000000";
 
-        WAIT FOR 100ns;
-        data_in_changed <= '0';
+		products(0) <= "0" & "010000" & "000000000";
+		products(1) <= "0" & "010000" & "000000001";
 
-        WAIT FOR 100ns;
-        RUN <= '1';
-        WAIT;
-    END PROCESS stimulus;
+		data_in_changed <= '1';
+
+		WAIT;
+	END PROCESS;
 
 END ARCHITECTURE test;

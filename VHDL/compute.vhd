@@ -46,11 +46,6 @@ BEGIN
                     order(index) <= this_row;
 
                     -- divide
-                    -- products[this_row] /= coefficients[this_row][index]
-                    -- coe = coefficients[this_row][index]
-                    -- for i in range(N):
-                    --     coefficients[this_row][i] /= coe
-                    -- end divide
                     products(this_row) <= products(this_row) / coefficients(this_row, index);
                     ceo := coefficients(this_row, index);
                     FOR i IN 0 TO N - 1 LOOP
