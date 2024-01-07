@@ -1,4 +1,4 @@
-import random
+import random, unittest
 N = 10
 RandLowerBound = -100
 RandUpperBound = 100
@@ -35,10 +35,27 @@ def solve(coefficients: list[list], products: list):
     return [products[i] for i in order]
 
 
-if __name__ == "__main__":
-    coefficients = [[random.randint(RandLowerBound, RandUpperBound)
-                     for j in range(N)] for i in range(N)]
-    products = [random.randint(RandLowerBound, RandUpperBound)
-                for i in range(N)]
-    for i in solve(coefficients, products):
-        print(i)
+
+class TestSum(unittest.TestCase):
+
+
+    def gen_test(self):
+        answers = [random.randint(RandLowerBound, RandUpperBound) for _ in range(N)]
+        coefficients = [[random.randint(RandLowerBound, RandUpperBound) for _ in range(N)] for _ in range(N)]
+        products = []
+        for i in range(N):
+            products.append(0)
+            for j in range(N):
+                products[i] += coefficients[i][j] * answers[j]
+        return coefficients, products, answers
+
+
+    def test_gaussian_elimination(self):
+
+        coefficients, products, answers = self.gen_test()
+        s = solve(coefficients, products)
+        for i in range(N):
+            self.assertAlmostEqual(s[i], answers[i])
+
+if __name__ == '__main__':
+    unittest.main()
