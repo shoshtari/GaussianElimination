@@ -47,9 +47,15 @@ BEGIN
 
                     -- divide
                     -- products[this_row] /= coefficients[this_row][index]
-                    -- coefficients[this_row] = [x / coefficients[this_row][index]
-                    --                           for x in coefficients[this_row]]
+                    -- coe = coefficients[this_row][index]
+                    -- for i in range(N):
+                    --     coefficients[this_row][i] /= coe
                     -- end divide
+                    products(this_row) <= products(this_row) / coefficients(this_row, index);
+                    ceo := coefficients(this_row, index);
+                    FOR i IN 0 TO N - 1 LOOP
+                        coefficients(this_row, i) <= coefficients(this_row, i) / ceo;
+                    END LOOP;
 
                     -- setting coe of index for other equations to 0
                     FOR row IN 0 TO N - 1 LOOP
