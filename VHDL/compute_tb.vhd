@@ -11,7 +11,7 @@ USE work.arrays.ALL;
 ENTITY compute_tb IS
 END compute_tb;
 
-ARCHITECTURE behavior OF compute_tb IS
+ARCHITECTURE test OF compute_tb IS
     CONSTANT N : INTEGER := 2;
     -- Component Declaration for the Unit Under Test (UUT)
 
@@ -36,6 +36,7 @@ ARCHITECTURE behavior OF compute_tb IS
     SIGNAL result : t_result(0 TO N - 1);
     SIGNAL data_in_changed : STD_LOGIC;
     SIGNAL data_ready : STD_LOGIC;
+    SIGNAL RUN : STD_LOGIC := '0';
 
 BEGIN
 
@@ -52,8 +53,9 @@ BEGIN
         data_ready => data_ready
     );
 
-    PROCESS
-    BEGIN
+    stimulus :
+    PROCESS BEGIN
+        WAIT FOR 100ns;
         coefficients(0, 0) <= "0" & "001111" & "000000000"; -- 2
         coefficients(0, 1) <= "0" & "001111" & "000000000";
         coefficients(1, 0) <= "0" & "001111" & "000000000";
@@ -65,7 +67,9 @@ BEGIN
         WAIT FOR 100ns;
         data_in_changed <= '0';
 
+        WAIT FOR 100ns;
+        RUN <= '1';
         WAIT;
-    END PROCESS;
+    END PROCESS stimulus;
 
-END;
+END ARCHITECTURE test;
