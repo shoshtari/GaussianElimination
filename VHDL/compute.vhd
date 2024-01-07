@@ -14,7 +14,7 @@ ENTITY computeGaussian IS
         products_in : IN t_products(0 TO N - 1);
         result : OUT t_result(0 TO N - 1);
         data_in_changed : IN STD_LOGIC; -- when user changes coe and products set this to 1
-        data_ready : OUT STD_LOGIC -- returns 1 when calculation is done
+        data_ready : OUT STD_LOGIC := '0' -- returns 1 when calculation is done
     );
 END ENTITY computeGaussian;
 
@@ -23,10 +23,10 @@ ARCHITECTURE rtl OF computeGaussian IS
     SIGNAL order : t_array(0 TO N - 1);
 BEGIN
     PROCESS (clk)
-        VARIABLE index : INTEGER range 0 to N-1 := 0;
-        VARIABLE ceo : float(6 DOWNTO -9);	
-		variable coefficients : t_coefficients(0 TO N - 1, 0 TO N - 1);
-		variable products : t_products(0 TO N - 1);
+        VARIABLE index : INTEGER RANGE 0 TO N - 1 := 0;
+        VARIABLE ceo : float(6 DOWNTO -9);
+        VARIABLE coefficients : t_coefficients(0 TO N - 1, 0 TO N - 1);
+        VARIABLE products : t_products(0 TO N - 1);
     BEGIN
         IF rising_edge(clk) THEN
             IF data_in_changed = '0' THEN
@@ -39,13 +39,13 @@ BEGIN
                     data_ready <= '1';
                     this_row <= - 1;
                 ELSIF this_row /= - 1 THEN
-                    data_ready <= '1';
+                    data_ready <= '0';
                     index := 0;
-                    FOR i IN N - 1 downto 0 LOOP
-                        if coefficients(this_row, index) /= 0 then
+                    FOR i IN N - 1 DOWNTO 0 LOOP
+                        IF coefficients(this_row, index) /= 0 THEN
                             index := i;
-                        end if;
-                    end loop;
+                        END IF;
+                    END LOOP;
 
                     order(index) <= this_row;
 
@@ -71,10 +71,10 @@ BEGIN
 
             ELSIF data_in_changed = '1' THEN
                 -- when input data changed 
-				coefficients := coefficients_in;
-				products := products_in;
+                coefficients := coefficients_in;
+                products := products_in;
                 this_row <= 0;
-                order <= (OTHERS => 0);	 
+                order <= (OTHERS => 0);
             END IF;
         END IF;
     END PROCESS;
