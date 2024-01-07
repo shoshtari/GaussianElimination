@@ -1,49 +1,52 @@
-LIBRARY IEEE;
+LIBRARY gaussian;
+LIBRARY ieee;
+USE gaussian.arrays.ALL;
+USE ieee.float_pkg.ALL;
 USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
-USE ieee.float_pkg.ALL;
 USE work.arrays.ALL;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---USE ieee.numeric_std.ALL;
+-- Add your library and packages declaration here ...
 
-ENTITY compute_tb IS
-END compute_tb;
+ENTITY computegaussian_tb IS
+    -- Generic declarations of the tested unit
+    GENERIC (
+        N : INTEGER := 2);
+END computegaussian_tb;
 
-ARCHITECTURE test OF compute_tb IS
-    CONSTANT N : INTEGER := 2;
-    -- Component Declaration for the Unit Under Test (UUT)
-
-    COMPONENT computeGaussian
+ARCHITECTURE TB_ARCHITECTURE OF computegaussian_tb IS
+    -- Component declaration of the tested unit
+    COMPONENT computegaussian
         GENERIC (
-            N : INTEGER
-        );
+            N : INTEGER := 2);
         PORT (
             clk : IN STD_LOGIC;
             coefficients : INOUT t_coefficients(0 TO N - 1, 0 TO N - 1);
             products : INOUT t_products(0 TO N - 1);
             result : OUT t_result(0 TO N - 1);
-            data_in_changed : INOUT STD_LOGIC; -- when user changes coe and products set this to 1
-            data_ready : OUT STD_LOGIC -- returns 1 when calculation is done
-        );
+            data_in_changed : IN STD_LOGIC;
+            data_ready : OUT STD_LOGIC);
     END COMPONENT;
 
-    --Inputs
-    SIGNAL clk : STD_LOGIC := '0';
+    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
+    SIGNAL clk : STD_LOGIC;
     SIGNAL coefficients : t_coefficients(0 TO N - 1, 0 TO N - 1);
     SIGNAL products : t_products(0 TO N - 1);
-    SIGNAL result : t_result(0 TO N - 1);
     SIGNAL data_in_changed : STD_LOGIC;
+    -- Observed signals - signals mapped to the output ports of tested entity
+    SIGNAL result : t_result(0 TO N - 1);
     SIGNAL data_ready : STD_LOGIC;
-    SIGNAL RUN : STD_LOGIC := '0';
+
+    -- Add your code here ...
 
 BEGIN
 
-    -- Instantiate the Unit Under Test (UUT)
-    uut : computeGaussian
+    -- Unit Under Test port map
+    UUT : computegaussian
     GENERIC MAP(
-        N => N)
+        N => N
+    )
+
     PORT MAP(
         clk => clk,
         coefficients => coefficients,
@@ -53,29 +56,38 @@ BEGIN
         data_ready => data_ready
     );
 
-	PROCESS
-	BEGIN
-		clk <= '1';
-		WAIT FOR 10ns;
-		clk <= '0';
-		WAIT FOR 10ns;
-	END PROCESS;
-	
-	PROCESS BEGIN
+    -- Add your stimulus here ...
 
-		data_in_changed <= '0';
-		WAIT FOR 50ns;
-		coefficients(0, 0) <= "0" & "001111" & "000000000"; -- 2
-		coefficients(0, 1) <= "0" & "001111" & "000000000";
-		coefficients(1, 0) <= "0" & "001111" & "000000000";
-		coefficients(1, 1) <= "0" & "001111" & "000000000";
+    PROCESS
+    BEGIN
+        clk <= '1';
+        WAIT FOR 10ns;
+        clk <= '0';
+        WAIT FOR 10ns;
+    END PROCESS;
 
-		products(0) <= "0" & "010000" & "000000000";
-		products(1) <= "0" & "010000" & "000000001";
+    PROCESS BEGIN
 
-		data_in_changed <= '1';
+        data_in_changed <= '1';
+        WAIT FOR 50ns;
+        coefficients(0, 0) <= "0" & "001111" & "000000000"; -- 2
+        coefficients(0, 1) <= "0" & "001111" & "000000000";
+        coefficients(1, 0) <= "0" & "001111" & "000000000";
+        coefficients(1, 1) <= "0" & "001111" & "000000000";
 
-		WAIT;
-	END PROCESS;
+        products(0) <= "0" & "010000" & "000000000";
+        products(1) <= "0" & "010000" & "000000001";
 
-END ARCHITECTURE test;
+        data_in_changed <= '0';
+
+        WAIT;
+    END PROCESS;
+END TB_ARCHITECTURE;
+
+CONFIGURATION TESTBENCH_FOR_computegaussian OF computegaussian_tb IS
+    FOR TB_ARCHITECTURE
+        FOR UUT : computegaussian
+            USE ENTITY work.computegaussian(rtl);
+        END FOR;
+    END FOR;
+END TESTBENCH_FOR_computegaussian;

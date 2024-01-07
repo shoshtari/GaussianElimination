@@ -6,14 +6,14 @@ USE work.arrays.ALL;
 
 ENTITY computeGaussian IS
     GENERIC (
-        N : INTEGER := 10
+        N : INTEGER := 2
     );
     PORT (
         clk : IN STD_LOGIC;
         coefficients : INOUT t_coefficients(0 TO N - 1, 0 TO N - 1);
         products : INOUT t_products(0 TO N - 1);
         result : OUT t_result(0 TO N - 1);
-        data_in_changed : INOUT STD_LOGIC; -- when user changes coe and products set this to 1
+        data_in_changed : IN STD_LOGIC; -- when user changes coe and products set this to 1
         data_ready : OUT STD_LOGIC -- returns 1 when calculation is done
     );
 END ENTITY computeGaussian;
@@ -23,7 +23,7 @@ ARCHITECTURE rtl OF computeGaussian IS
     SIGNAL order : t_array(0 TO N - 1);
 BEGIN
     PROCESS (clk)
-        VARIABLE index : INTEGER := 0;
+        VARIABLE index : INTEGER range 0 to N-1 := 0;
         VARIABLE ceo : float(6 DOWNTO -9);
     BEGIN
         IF rising_edge(clk) THEN
@@ -32,16 +32,18 @@ BEGIN
                     -- after n clock cycle this_row would become N and we should calculate 
                     -- result array based on products buffer
                     FOR i IN 0 TO N - 1 LOOP -- maybe we should use #for generate
-                        result(i) <= to_integer(products(order(i)));
+                        result(i) <= products(order(i));
                     END LOOP;
                     data_ready <= '1';
                     this_row <= - 1;
                 ELSIF this_row /= - 1 THEN
                     data_ready <= '1';
                     index := 0;
-                    WHILE coefficients(this_row, index) = 0 LOOP
-                        index := index + 1;
-                    END LOOP;
+                    FOR i IN N - 1 downto 0 LOOP
+                        if coefficients(this_row, index) /= 0 then
+                            index := i;
+                        end if;
+                    end loop;
 
                     order(index) <= this_row;
 
@@ -68,8 +70,7 @@ BEGIN
             ELSIF data_in_changed = '1' THEN
                 -- when input data changed
                 this_row <= 0;
-                order <= (OTHERS => 0);
-                data_in_changed <= '0';
+                order <= (OTHERS => 0);	 
             END IF;
         END IF;
     END PROCESS;
