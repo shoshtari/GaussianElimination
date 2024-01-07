@@ -1,6 +1,7 @@
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
+USE ieee.float_pkg.ALL;
 USE work.arrays.ALL;
 
 ENTITY computeGaussian IS
@@ -12,8 +13,8 @@ ENTITY computeGaussian IS
         coefficients : INOUT t_coefficients(0 TO N - 1, 0 TO N - 1);
         products : INOUT t_products(0 TO N - 1);
         result : OUT t_result(0 TO N - 1);
-        data_in_changed : INOUT STD_LOGIC;  -- when user changes coe and products set this to 1
-        data_ready : OUT STD_LOGIC          -- returns 1 when calculation is done
+        data_in_changed : INOUT STD_LOGIC; -- when user changes coe and products set this to 1
+        data_ready : OUT STD_LOGIC -- returns 1 when calculation is done
     );
 END ENTITY computeGaussian;
 
@@ -23,7 +24,7 @@ ARCHITECTURE rtl OF computeGaussian IS
 BEGIN
     PROCESS (clk)
         VARIABLE index : INTEGER := 0;
-        VARIABLE ceo : INTEGER := 0;
+        VARIABLE ceo : float(6 DOWNTO -9);
     BEGIN
         IF rising_edge(clk) THEN
             IF data_in_changed = '0' THEN
@@ -31,7 +32,7 @@ BEGIN
                     -- after n clock cycle this_row would become N and we should calculate 
                     -- result array based on products buffer
                     FOR i IN 0 TO N - 1 LOOP -- maybe we should use #for generate
-                        result(i) <= products(order(i));
+                        result(i) <= to_integer(products(order(i)));
                     END LOOP;
                     data_ready <= '1';
                     this_row <= - 1;

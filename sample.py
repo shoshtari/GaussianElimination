@@ -1,8 +1,9 @@
 import random, unittest
-N = 2
+N = 5
 RandLowerBound = -10
 RandUpperBound = 10
 
+# def gcd(a, b)
 
 def frac_solve(coefficients: list[list], products: list):
     '''apply GaussianElimination to Solve N equations with coefficients and products matrices'''
@@ -14,13 +15,14 @@ def frac_solve(coefficients: list[list], products: list):
 
     for this_row in range(N):
         index = 0
-        while coefficients[this_row][index] < 0.1:
+        while abs(coefficients[this_row][index]) < 0.01 * abs(coefficients_denom[this_row][index]):
             index += 1
             if index >= N:
-                print("ERR", coefficients, this_row)
+                print("ERR", coefficients, this_row, index)
         # find the first non-zero index in coefficients[this_row] equation
 
         order[index] = this_row
+        print(coefficients, coefficients_denom)
         print(products, products_denom)
 
         # products[this_row] /= coefficients[this_row][index]
@@ -57,7 +59,7 @@ def frac_solve(coefficients: list[list], products: list):
             to_be_decrease = coe * products[this_row]
             to_be_decrease_denom = coe_denom * products_denom[this_row]
 
-            products[row] = products[row] * to_be_decrease_denom - to_be_decrease * products_denom[this_row]
+            products[row] = products[row] * to_be_decrease_denom - to_be_decrease * products_denom[row]
             products_denom[row] *= to_be_decrease_denom
 
     return [products[i] / products_denom[i]  for i in order]
