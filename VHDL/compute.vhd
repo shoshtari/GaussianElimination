@@ -10,8 +10,8 @@ ENTITY computeGaussian IS
     );
     PORT (
         clk : IN STD_LOGIC;
-        coefficients : INOUT t_coefficients(0 TO N - 1, 0 TO N - 1);
-        products : INOUT t_products(0 TO N - 1);
+        coefficients_in : IN t_coefficients(0 TO N - 1, 0 TO N - 1);
+        products_in : IN t_products(0 TO N - 1);
         result : OUT t_result(0 TO N - 1);
         data_in_changed : IN STD_LOGIC; -- when user changes coe and products set this to 1
         data_ready : OUT STD_LOGIC -- returns 1 when calculation is done
@@ -24,7 +24,9 @@ ARCHITECTURE rtl OF computeGaussian IS
 BEGIN
     PROCESS (clk)
         VARIABLE index : INTEGER range 0 to N-1 := 0;
-        VARIABLE ceo : float(6 DOWNTO -9);
+        VARIABLE ceo : float(6 DOWNTO -9);	
+		variable coefficients : t_coefficients(0 TO N - 1, 0 TO N - 1);
+		variable products : t_products(0 TO N - 1);
     BEGIN
         IF rising_edge(clk) THEN
             IF data_in_changed = '0' THEN
@@ -48,10 +50,10 @@ BEGIN
                     order(index) <= this_row;
 
                     -- divide
-                    products(this_row) <= products(this_row) / coefficients(this_row, index);
+                    products(this_row) := products(this_row) / coefficients(this_row, index);
                     ceo := coefficients(this_row, index);
                     FOR i IN 0 TO N - 1 LOOP
-                        coefficients(this_row, i) <= coefficients(this_row, i) / ceo;
+                        coefficients(this_row, i) := coefficients(this_row, i) / ceo;
                     END LOOP;
 
                     -- setting coe of index for other equations to 0
@@ -59,7 +61,7 @@ BEGIN
                         IF row /= this_row THEN
                             ceo := coefficients(row, index);
                             FOR column IN 0 TO N - 1 LOOP
-                                coefficients(row, column) <= coefficients(row, column) - ceo * coefficients(this_row, column);
+                                coefficients(row, column) := coefficients(row, column) - ceo * coefficients(this_row, column);
                             END LOOP;
                         END IF;
                     END LOOP;
@@ -68,7 +70,9 @@ BEGIN
                 END IF;
 
             ELSIF data_in_changed = '1' THEN
-                -- when input data changed
+                -- when input data changed 
+				coefficients := coefficients_in;
+				products := products_in;
                 this_row <= 0;
                 order <= (OTHERS => 0);	 
             END IF;

@@ -21,8 +21,8 @@ ARCHITECTURE TB_ARCHITECTURE OF computegaussian_tb IS
             N : INTEGER := 2);
         PORT (
             clk : IN STD_LOGIC;
-            coefficients : INOUT t_coefficients(0 TO N - 1, 0 TO N - 1);
-            products : INOUT t_products(0 TO N - 1);
+            coefficients_in : IN t_coefficients(0 TO N - 1, 0 TO N - 1);
+            products_in : IN t_products(0 TO N - 1);
             result : OUT t_result(0 TO N - 1);
             data_in_changed : IN STD_LOGIC;
             data_ready : OUT STD_LOGIC);
@@ -30,8 +30,8 @@ ARCHITECTURE TB_ARCHITECTURE OF computegaussian_tb IS
 
     -- Stimulus signals - signals mapped to the input and inout ports of tested entity
     SIGNAL clk : STD_LOGIC;
-    SIGNAL coefficients : t_coefficients(0 TO N - 1, 0 TO N - 1);
-    SIGNAL products : t_products(0 TO N - 1);
+    SIGNAL coefficients_in : t_coefficients(0 TO N - 1, 0 TO N - 1);
+    SIGNAL products_in : t_products(0 TO N - 1);
     SIGNAL data_in_changed : STD_LOGIC;
     -- Observed signals - signals mapped to the output ports of tested entity
     SIGNAL result : t_result(0 TO N - 1);
@@ -49,8 +49,8 @@ BEGIN
 
     PORT MAP(
         clk => clk,
-        coefficients => coefficients,
-        products => products,
+        coefficients_in => coefficients_in,
+        products_in => products_in,
         result => result,
         data_in_changed => data_in_changed,
         data_ready => data_ready
@@ -70,13 +70,13 @@ BEGIN
 
         data_in_changed <= '1';
         WAIT FOR 50ns;
-        coefficients(0, 0) <= "0" & "001111" & "000000000"; -- 2
-        coefficients(0, 1) <= "0" & "001111" & "000000000";
-        coefficients(1, 0) <= "0" & "001111" & "000000000";
-        coefficients(1, 1) <= "0" & "001111" & "000000000";
+        coefficients_in(0, 0) <= "0" & "001111" & "000000000"; -- 2
+        coefficients_in(0, 1) <= "0" & "001111" & "000000000";
+        coefficients_in(1, 0) <= "0" & "001111" & "000000000";
+        coefficients_in(1, 1) <= "0" & "001111" & "000000000";
 
-        products(0) <= "0" & "010000" & "000000000";
-        products(1) <= "0" & "010000" & "000000001";
+        products_in(0) <= "0" & "010000" & "000000000";
+        products_in(1) <= "0" & "010000" & "000000001";
 
         data_in_changed <= '0';
 
